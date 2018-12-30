@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using CompanyBlog.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using CompanyBlog.Models;
 
 namespace CompanyBlog
 {
@@ -37,15 +38,24 @@ namespace CompanyBlog
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<CompanyUser, CompanyRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultUI()
+                .AddDefaultTokenProviders();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            ApplicationDbContext context,
+            RoleManager<CompanyRole> roleManager,
+            UserManager<CompanyUser> userManager)
         {
+            //seed sample user data
+            SampleUserData.Initialize(context, userManager, roleManager).Wait();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -67,8 +77,9 @@ namespace CompanyBlog
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Post}/{action=Index}/{id?}");
             });
+
         }
     }
 }
