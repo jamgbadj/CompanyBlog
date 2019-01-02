@@ -1,21 +1,20 @@
 ﻿@model CompanyBlog.Models.Post
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Title;
 }
 
-<h2>Details</h2>
+<h2>@Model.Title</h2>
 
 <div>
-    <h4>Post</h4>
     <hr />
+    @*Display Post Image*@
+    @if (!String.IsNullOrEmpty(Model.Image))
+    {
+        var imagePath = $"/Image/{Model.Image}";
+        <img src="@imagePath " width="500">
+    }
     <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Author)
         </dt>
@@ -28,9 +27,18 @@
         <dd>
             @Html.DisplayFor(model => model.Body)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PostedOn)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PostedOn)
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.PostID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (User.IsInRole("Admin"))
+    {
+    <a asp-action="Edit" asp-route-id="@Model.PostID">Edit</a>
+    }
+    | <a asp-action="Index">Back to List</a>
 </div>

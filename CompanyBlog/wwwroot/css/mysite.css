@@ -1,0 +1,31 @@
+﻿body {
+    
+}
+
+.jumbotron {
+    text-align: center;
+    background-color: transparent;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    border-radius: 0
+}
+
+.landing-image {
+    margin-top:0;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    background-image: url('../images/nicolas-bichon-1216303-unsplash.jpg');
+    background-position:center;
+    background-size:cover;
+    height: 400px;
+}
+
+.landing-text {
+    /*padding-top: 50px;*/
+    max-width: 800px;
+    width: 100%;
+    color: white;
+    text-align: center;
+    margin: auto;
+    text-shadow: 0 3px 12px #808080;
+}

@@ -4,7 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<div class="jumbotron landing-image">
+    <div class="landing-text">
+        <h1>Welcome to my blog!</h1>
+    <p>Thank you for taking the time to visit my blog! I'm Justin, a photographer.
+     Here I make blog posts about the images I create, I hope you enjoy viewing them.</p>
+    </div>
+</div>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -20,6 +26,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Body)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PostedOn)
             </th>
             <th></th>
         </tr>
@@ -37,9 +46,16 @@
                 @Html.DisplayFor(modelItem => item.Body)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
+                @Html.DisplayFor(modelItem => item.PostedOn)
+            </td>
+            <td>
                 <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
+                @*Only show edit and delete buttons if user is an admin*@
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> 
+                    <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
+                }
             </td>
         </tr>
 }

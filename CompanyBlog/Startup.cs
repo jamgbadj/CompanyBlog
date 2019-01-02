@@ -13,6 +13,8 @@ using CompanyBlog.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using CompanyBlog.Models;
+using CompanyBlog.Data.Repository;
+using CompanyBlog.Data.FileManager;
 
 namespace CompanyBlog
 {
@@ -42,6 +44,9 @@ namespace CompanyBlog
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
+
+            services.AddTransient<IRepository, Repository>();
+            services.AddTransient<IFileManager, FileManager>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -77,7 +82,7 @@ namespace CompanyBlog
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Post}/{action=Index}/{id?}");
+                    template: "{controller=Posts}/{action=Index}/{id?}");
             });
 
         }

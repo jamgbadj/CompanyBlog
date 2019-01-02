@@ -7,34 +7,38 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CompanyBlog.Data;
 using CompanyBlog.Models;
+using CompanyBlog.Data.Repository;
+using CompanyBlog.Data.FileManager;
 
 namespace CompanyBlog.Controllers
 {
     public class PostsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private IRepository _repository;
+        private IFileManager _fileManager;
 
-        public PostsController(ApplicationDbContext context)
+        public PostsController(IRepository repository, IFileManager fileManager)
         {
-            _context = context;
+            _repository = repository;
+            _fileManager = fileManager;
         }
 
         // GET: Posts
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Post.ToListAsync());
+            var posts = _repository.GetAllPosts();
+            return View(posts);
         }
 
         // GET: Posts/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var post = await _context.Post
-                .FirstOrDefaultAsync(m => m.PostID == id);
+            var post = _repository.GetPost((int)id);
             if (post == null)
             {
                 return NotFound();
@@ -46,48 +50,68 @@ namespace CompanyBlog.Controllers
         // GET: Posts/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new PostViewModel());
         }
 
-        // POST: Posts/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PostID,Title,Author,Body")] Post post)
+        public async Task<IActionResult> Create(PostViewModel viewModel)
         {
+            var post = new Post {
+                PostID = viewModel.PostID,
+                Title = viewModel.Title,
+                Author = viewModel.Author,
+                Body = viewModel.Body,
+                Image = await _fileManager.SaveImage(viewModel.Image)
+            };
             if (ModelState.IsValid)
             {
-                _context.Add(post);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _repository.CreatePost(post);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(post);
             }
             return View(post);
         }
 
         // GET: Posts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var post = await _context.Post.FindAsync(id);
+            var post = _repository.GetPost((int)id);
             if (post == null)
             {
                 return NotFound();
             }
-            return View(post);
+            return View(new PostViewModel {
+                PostID = post.PostID,
+                Title = post.Title,
+                Author = post.Author,
+                Body = post.Body
+            });
         }
 
         // POST: Posts/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostID,Title,Author,Body")] Post post)
+        public async Task<IActionResult> Edit(int id, PostViewModel viewModel)
         {
+            var post = new Post
+            {
+                PostID = viewModel.PostID,
+                Title = viewModel.Title,
+                Author = viewModel.Author,
+                Body = viewModel.Body,
+                Image = await _fileManager.SaveImage(viewModel.Image)
+            };
+
             if (id != post.PostID)
             {
                 return NotFound();
@@ -97,8 +121,8 @@ namespace CompanyBlog.Controllers
             {
                 try
                 {
-                    _context.Update(post);
-                    await _context.SaveChangesAsync();
+                    _repository.UpdatePost(post);
+                    await _repository.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,15 +141,14 @@ namespace CompanyBlog.Controllers
         }
 
         // GET: Posts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var post = await _context.Post
-                .FirstOrDefaultAsync(m => m.PostID == id);
+            var post = _repository.GetPost((int)id);
             if (post == null)
             {
                 return NotFound();
@@ -139,15 +162,22 @@ namespace CompanyBlog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var post = await _context.Post.FindAsync(id);
-            _context.Post.Remove(post);
-            await _context.SaveChangesAsync();
+            _repository.DeletePost(id);
+            await _repository.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PostExists(int id)
         {
-            return _context.Post.Any(e => e.PostID == id);
+           return _repository.PostExists(id);
+        }
+
+        //Stream Image through path specified
+        [HttpGet("/Image/{image}")]
+        public IActionResult Image(string image)
+        {
+            var mimeType = image.Substring(image.LastIndexOf('.') +1);
+            return new FileStreamResult(_fileManager.ImageStream(image), $"image/{mimeType}");
         }
     }
 }

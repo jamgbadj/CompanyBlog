@@ -110,6 +110,8 @@ namespace CompanyBlog.Migrations
                     b.Property<string>("Body")
                         .IsRequired();
 
+                    b.Property<string>("Image");
+
                     b.Property<DateTime>("PostedOn");
 
                     b.Property<string>("Title")

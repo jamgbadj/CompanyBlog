@@ -21,7 +21,9 @@ namespace CompanyBlog.Models
         [Required]
         public string Body { get; set; } = "";
 
-        [ScaffoldColumn(false)]
+        public string Image { get; set; } = "";
+
+        [Display(Name = "Posted On")]
         public DateTime PostedOn { get; set; } = DateTime.Now;
     }
 }

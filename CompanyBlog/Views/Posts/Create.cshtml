@@ -1,4 +1,4 @@
-﻿@model CompanyBlog.Models.Post
+﻿@model CompanyBlog.Models.PostViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -21,6 +21,11 @@
                 <label asp-for="Author" class="control-label"></label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input asp-for="Image" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Body" class="control-label"></label>
