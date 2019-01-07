@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CompanyBlog.Models.Comments;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -25,5 +26,9 @@ namespace CompanyBlog.Models
 
         [Display(Name = "Posted On")]
         public DateTime PostedOn { get; set; } = DateTime.Now;
+
+        public List<MainComment> MainComments { get; set; }
+
+        public int ViewCount { get; set; }
     }
 }

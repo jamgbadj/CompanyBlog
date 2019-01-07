@@ -12,16 +12,22 @@ namespace CompanyBlog.Models
         [Key]
         public int PostID { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="Please give your post a title")]
         [MinLength(3), MaxLength(50)]
         public string Title { get; set; } = "";
 
-        [MinLength(3), MaxLength(50)]
         public string Author { get; set; } = "";
 
-        [Required]
+        [Required(ErrorMessage ="Please add a body to your post")]
         public string Body { get; set; } = "";
 
+
+        public string CurrentImage { get; set; } = "";
+
+
         public IFormFile Image { get; set; } = null;
+
+        public int ViewCount { get; set; }
+
     }
 }

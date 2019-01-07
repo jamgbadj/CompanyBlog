@@ -19,6 +19,44 @@ namespace CompanyBlog.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("CompanyBlog.Models.Comments.MainComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Message");
+
+                    b.Property<int?>("PostID");
+
+                    b.Property<DateTime>("PostedOn");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostID");
+
+                    b.ToTable("MainComments");
+                });
+
+            modelBuilder.Entity("CompanyBlog.Models.Comments.SubComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("MainCommentId");
+
+                    b.Property<string>("Message");
+
+                    b.Property<DateTime>("PostedOn");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MainCommentId");
+
+                    b.ToTable("SubComments");
+                });
+
             modelBuilder.Entity("CompanyBlog.Models.CompanyRole", b =>
                 {
                     b.Property<string>("Id")
@@ -118,6 +156,8 @@ namespace CompanyBlog.Migrations
                         .IsRequired()
                         .HasMaxLength(50);
 
+                    b.Property<int>("ViewCount");
+
                     b.HasKey("PostID");
 
                     b.ToTable("Post");
@@ -207,6 +247,21 @@ namespace CompanyBlog.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("CompanyBlog.Models.Comments.MainComment", b =>
+                {
+                    b.HasOne("CompanyBlog.Models.Post")
+                        .WithMany("MainComments")
+                        .HasForeignKey("PostID");
+                });
+
+            modelBuilder.Entity("CompanyBlog.Models.Comments.SubComment", b =>
+                {
+                    b.HasOne("CompanyBlog.Models.Comments.MainComment")
+                        .WithMany("SubComments")
+                        .HasForeignKey("MainCommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

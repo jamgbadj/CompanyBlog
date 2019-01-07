@@ -24,70 +24,26 @@
         <div class="col-lg-8 col-md-10 mx-auto">
             @foreach (var item in Model)
             {
-                <div class="post-preview">
-                    <a asp-action="Details" asp-route-id="@item.PostID">
-                        <h2>@Html.DisplayFor(modelItem => item.Title)</h2>
-                    </a>
-                    <div class="post-body-preview">
-                        @Html.DisplayFor(modelItem => item.Body)
-                    </div>
-                    <p class="post-meta">
-                        Posted by @Html.DisplayFor(modelItem => item.Author) on @Html.DisplayFor(modelItem => item.PostedOn)
-                    </p>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
-                    }
+            <div class="post-preview">
+                <a asp-action="Details" asp-route-id="@item.PostID">
+                    <h2>@Html.DisplayFor(modelItem => item.Title)</h2>
+                </a>
+                <div class="post-body-preview">
+                    @Html.Raw(item.Body)
                 </div>
+                <p class="post-meta">
+                    Posted by @Html.DisplayFor(modelItem => item.Author) on @Html.DisplayFor(modelItem => item.PostedOn)
+                </p>
+
+                @if(User.IsInRole("Admin")){
+                    <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
+                    <i class="far fa-eye"></i>
+                    @item.ViewCount
+                }
+            </div>
                 <hr>
             }
         </div>
     </div>
 </div>
-@*<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Body)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PostedOn)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PostedOn)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
-                @*Only show edit and delete buttons if user is an admin*@
-                @*@if (User.IsInRole("Admin"))*@
-                @*{
-                    <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> 
-                    <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
-                }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>*@

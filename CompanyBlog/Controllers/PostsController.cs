@@ -9,6 +9,9 @@ using CompanyBlog.Data;
 using CompanyBlog.Models;
 using CompanyBlog.Data.Repository;
 using CompanyBlog.Data.FileManager;
+using CompanyBlog.Models.Comments;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CompanyBlog.Controllers
 {
@@ -16,14 +19,17 @@ namespace CompanyBlog.Controllers
     {
         private IRepository _repository;
         private IFileManager _fileManager;
+        private UserManager<CompanyUser> _userManager;
 
-        public PostsController(IRepository repository, IFileManager fileManager)
+        public PostsController(IRepository repository, IFileManager fileManager, UserManager<CompanyUser> userManager)
         {
             _repository = repository;
             _fileManager = fileManager;
+            _userManager = userManager;
         }
 
         // GET: Posts
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var posts = _repository.GetAllPosts();
@@ -31,7 +37,8 @@ namespace CompanyBlog.Controllers
         }
 
         // GET: Posts/Details/5
-        public IActionResult Details(int? id)
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -43,7 +50,9 @@ namespace CompanyBlog.Controllers
             {
                 return NotFound();
             }
-
+            post.ViewCount++;
+            _repository.UpdatePost(post);
+            await _repository.SaveChangesAsync();
             return View(post);
         }
 
@@ -55,16 +64,25 @@ namespace CompanyBlog.Controllers
 
         
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PostViewModel viewModel)
         {
+            string userName = _userManager.GetUserName(User);
+
             var post = new Post {
                 PostID = viewModel.PostID,
                 Title = viewModel.Title,
-                Author = viewModel.Author,
+                Author = userName,
                 Body = viewModel.Body,
                 Image = await _fileManager.SaveImage(viewModel.Image)
             };
+
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .Select(x => new { x.Key, x.Value.Errors })
+                .ToArray();
+
             if (ModelState.IsValid)
             {
                 _repository.CreatePost(post);
@@ -72,12 +90,13 @@ namespace CompanyBlog.Controllers
                 {
                     return RedirectToAction(nameof(Index));
                 }
-                return View(post);
+                return View(viewModel);
             }
-            return View(post);
+            return View(viewModel);
         }
 
         // GET: Posts/Edit/5
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -94,23 +113,38 @@ namespace CompanyBlog.Controllers
                 PostID = post.PostID,
                 Title = post.Title,
                 Author = post.Author,
-                Body = post.Body
+                Body = post.Body,
+                CurrentImage = post.Image,
+                ViewCount = post.ViewCount
             });
         }
 
         // POST: Posts/Edit/5
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PostViewModel viewModel)
         {
+            var viewcount = viewModel.ViewCount;
             var post = new Post
             {
                 PostID = viewModel.PostID,
                 Title = viewModel.Title,
-                Author = viewModel.Author,
+                Author = User.Identity.Name,
                 Body = viewModel.Body,
-                Image = await _fileManager.SaveImage(viewModel.Image)
+                ViewCount = viewModel.ViewCount
             };
+
+            if (viewModel.Image == null)
+            {
+                post.Image = viewModel.CurrentImage;
+            }
+
+            else
+            {
+                post.Image = await _fileManager.SaveImage(viewModel.Image);
+
+            }
 
             if (id != post.PostID)
             {
@@ -137,10 +171,11 @@ namespace CompanyBlog.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(post);
+            return View(viewModel);
         }
 
         // GET: Posts/Delete/5
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -158,6 +193,7 @@ namespace CompanyBlog.Controllers
         }
 
         // POST: Posts/Delete/5
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -178,6 +214,44 @@ namespace CompanyBlog.Controllers
         {
             var mimeType = image.Substring(image.LastIndexOf('.') +1);
             return new FileStreamResult(_fileManager.ImageStream(image), $"image/{mimeType}");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Comment(CommentViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Details", new { id = viewModel.PostId });
+            }
+
+            var post = _repository.GetPost(viewModel.PostId);
+
+            if (viewModel.MainCommentId == 0)
+            {
+                post.MainComments = post.MainComments ?? new List<MainComment>();
+
+                post.MainComments.Add(new MainComment
+                {
+                    Message = viewModel.Message,
+                    PostedOn = DateTime.Now,
+                });
+                _repository.UpdatePost(post);
+            }
+
+            else
+            {
+                var comment = new SubComment
+                {
+                    MainCommentId = viewModel.MainCommentId,
+                    Message = viewModel.Message,
+                    PostedOn = DateTime.Now
+                };
+                _repository.AddSubComment(comment);
+            }
+
+            await _repository.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = viewModel.PostId });
         }
     }
 }

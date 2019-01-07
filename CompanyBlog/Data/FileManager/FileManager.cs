@@ -48,7 +48,7 @@ namespace CompanyBlog.Data.FileManager
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                return "Error";
+                return "Error, Image could not be saved";
             }
         }
     }

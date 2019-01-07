@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace CompanyBlog.Data
 {
@@ -15,9 +16,10 @@ namespace CompanyBlog.Data
         {
             context.Database.EnsureCreated();
 
-            string adminID = "";
-
             string[] appRoles = new string[] { "Admin", "User" };
+
+            string accessLevel = "Access Level";
+            string[] userClaims = new string[] { "Admin", "User" };
 
             string password = "Password123!";
 
@@ -45,9 +47,8 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[0]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[0]));
                 }
-
-                user.Id = adminID;
             }
 
             //create customer 1
@@ -66,6 +67,7 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[1]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[1]));
                 }
             }
 
@@ -85,6 +87,7 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[1]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[1]));
                 }
             }
 
@@ -104,6 +107,7 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[1]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[1]));
                 }
             }
 
@@ -123,6 +127,7 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[1]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[1]));
                 }
             }
 
@@ -142,6 +147,7 @@ namespace CompanyBlog.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, appRoles[1]);
+                    await userManager.AddClaimAsync(user, new Claim(accessLevel, userClaims[1]));
                 }
             }
         }

@@ -20,6 +20,46 @@
     height: 620px;
 }
 
+.landing-image-create {
+    margin-top: 0;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    background-image: url('../images/sergey-zolkin-21234-unsplash.jpg');
+    background-position: center;
+    background-size: cover;
+    height: 620px;
+}
+
+.landing-image-details {
+    margin-top: 0;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    background-image: url('../images/kelly-sikkema-450720-unsplash.jpg');
+    background-position: center;
+    background-size: cover;
+    height: 400px;
+}
+
+.landing-image-manage {
+    margin-top: 0;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    background-image: url('../images/todd-quackenbush-701-unsplash.jpg');
+    background-position: center;
+    background-size: cover;
+    height: 400px;
+}
+
+.landing-image-reg {
+    margin-top: 0;
+    margin-left: calc(50% - 50vw);
+    width: 100vw;
+    background-image: url('../images/glenn-carstens-peters-190592-unsplash.jpg');
+    background-position: center;
+    background-size: cover;
+    height: 400px;
+}
+
 .landing-text {
     padding-top: 80px;
     max-width: 800px;
@@ -57,7 +97,7 @@ post-title {
     width:100%;
     white-space:nowrap;
     overflow:hidden;
-    display:block;
+    padding:20px;
     text-overflow:ellipsis;
 }
 
@@ -74,4 +114,59 @@ post-title {
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
     font-weight: 800;
     font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+
+.comment-section {
+    margin-left:auto;
+    margin-right:auto;
+    width:500px;
+    justify-content:center;
+}
+
+.subcomment {
+    margin-left:30px;
+}
+
+.tip {
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    background: transparent;
+    border: 10px solid #ccc;
+}
+
+.tip-up {
+    top: -25px;
+    left: 10px;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-top-color: transparent;
+}
+
+.tip-right {
+    top: 10px;
+    right: -25px;
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+}
+
+.dialogbox .body {
+    position: relative;
+    max-width: 300px;
+    height: auto;
+    margin: 20px 10px;
+    padding: 5px;
+    background-color: #DADADA;
+    border-radius: 3px;
+    border: 5px solid #ccc;
+}
+
+.body .message {
+    min-height: 30px;
+    border-radius: 3px;
+    font-family: Arial;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #797979;
 }
